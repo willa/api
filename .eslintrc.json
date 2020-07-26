@@ -1,0 +1,20 @@
+{
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "prettier/@typescript-eslint"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "sort-keys-fix",
+    "sort-destructure-keys",
+    "simple-import-sort",
+    "prettier"
+  ],
+  "rules": {
+    "prettier/prettier": "error",
+    "simple-import-sort/sort": "error",
+    "sort-destructure-keys/sort-destructure-keys": "error",
+    "sort-keys-fix/sort-keys-fix": "error"
+  }
+}
