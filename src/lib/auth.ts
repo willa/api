@@ -10,9 +10,35 @@ import { db } from '..'
 import { AuthToken, Context } from '../types'
 import { User } from '../types/type-graphql'
 
-export const authChecker: AuthChecker<Context, number> = async ({
-  context: { user }
-}): Promise<boolean> => !!user
+export const authChecker: AuthChecker<Context, number> = async (
+  { args: { accountId }, context: { user } },
+  roles
+): Promise<boolean> => {
+  if (roles.includes(Roles.MEMBER)) {
+    if (!user) {
+      return false
+    }
+
+    const [account] = await db.account.findMany({
+      where: {
+        id: accountId,
+        users: {
+          some: {
+            id: user.id
+          }
+        }
+      }
+    })
+
+    return !!account
+  }
+
+  return !!user
+}
+
+export enum Roles {
+  MEMBER
+}
 
 class Auth {
   createToken(user: User): string {
