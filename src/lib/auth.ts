@@ -10,8 +10,33 @@ import { db } from '..'
 import { AuthToken, Context } from '../types'
 import { User } from '../types/type-graphql'
 
+const isMember = async (id: number, userId: number): Promise<boolean> => {
+  const account = await db.account.findOne({
+    include: {
+      users: {
+        select: {
+          id: true
+        },
+        take: 1,
+        where: {
+          id: userId
+        }
+      }
+    },
+    where: {
+      id
+    }
+  })
+
+  if (!account) {
+    return false
+  }
+
+  return !!account.users.find(({ id }) => id === userId)
+}
+
 export const authChecker: AuthChecker<Context, number> = async (
-  { args: { accountId }, context: { user } },
+  { args: { accountId, itemId }, context: { user } },
   roles
 ): Promise<boolean> => {
   if (roles.includes(Roles.MEMBER)) {
@@ -19,18 +44,21 @@ export const authChecker: AuthChecker<Context, number> = async (
       return false
     }
 
-    const [account] = await db.account.findMany({
-      where: {
-        id: accountId,
-        users: {
-          some: {
-            id: user.id
-          }
+    if (itemId) {
+      const item = await db.item.findOne({
+        where: {
+          id: itemId
         }
-      }
-    })
+      })
 
-    return !!account
+      if (!item) {
+        return false
+      }
+
+      return isMember(item.accountId, user.id)
+    }
+
+    return isMember(accountId, user.id)
   }
 
   return !!user

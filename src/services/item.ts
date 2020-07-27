@@ -36,4 +36,24 @@ export class ItemService {
 
     return item
   }
+
+  async update(
+    id: number,
+    amount: number,
+    description: string,
+    type: string
+  ): Promise<Item> {
+    const item = await db.item.update({
+      data: {
+        amount,
+        description,
+        type
+      },
+      where: {
+        id
+      }
+    })
+
+    return item
+  }
 }

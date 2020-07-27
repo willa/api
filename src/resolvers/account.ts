@@ -1,6 +1,7 @@
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql'
 import { Inject } from 'typedi'
 
+import { Roles } from '../lib'
 import { AccountService } from '../services'
 import { Account, User } from '../types/type-graphql'
 
@@ -23,5 +24,15 @@ export class AccountResolver {
     @Arg('currency') currency: string
   ): Promise<Account> {
     return this.service.create(user, name, currency)
+  }
+
+  @Mutation(() => Account)
+  @Authorized(Roles.MEMBER)
+  updateAccount(
+    @Arg('accountId') accountId: number,
+    @Arg('name') name: string,
+    @Arg('currency') currency: string
+  ): Promise<Account> {
+    return this.service.update(accountId, name, currency)
   }
 }

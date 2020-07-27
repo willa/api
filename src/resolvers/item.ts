@@ -26,4 +26,15 @@ export class ItemResolver {
   ): Promise<Item> {
     return this.service.create(accountId, amount, description, type)
   }
+
+  @Mutation(() => Item)
+  @Authorized(Roles.MEMBER)
+  updateItem(
+    @Arg('itemId') itemId: number,
+    @Arg('amount') amount: number,
+    @Arg('description') description: string,
+    @Arg('type') type: string
+  ): Promise<Item> {
+    return this.service.update(itemId, amount, description, type)
+  }
 }

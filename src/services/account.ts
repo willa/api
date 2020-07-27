@@ -35,4 +35,18 @@ export class AccountService {
 
     return account
   }
+
+  async update(id: number, name: string, currency: string): Promise<Account> {
+    const account = await db.account.update({
+      data: {
+        currency,
+        name
+      },
+      where: {
+        id
+      }
+    })
+
+    return account
+  }
 }
