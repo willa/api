@@ -37,4 +37,10 @@ export class ItemResolver {
   ): Promise<Item> {
     return this.service.update(itemId, amount, description, type)
   }
+
+  @Mutation(() => Boolean)
+  @Authorized(Roles.MEMBER)
+  deleteItem(@Arg('itemId') itemId: number): Promise<boolean> {
+    return this.service.remove(itemId)
+  }
 }

@@ -56,4 +56,14 @@ export class ItemService {
 
     return item
   }
+
+  async remove(id: number): Promise<boolean> {
+    await db.item.delete({
+      where: {
+        id
+      }
+    })
+
+    return true
+  }
 }

@@ -49,4 +49,20 @@ export class AccountService {
 
     return account
   }
+
+  async remove(id: number): Promise<boolean> {
+    await db.item.deleteMany({
+      where: {
+        accountId: id
+      }
+    })
+
+    await db.account.delete({
+      where: {
+        id
+      }
+    })
+
+    return true
+  }
 }

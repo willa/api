@@ -35,4 +35,10 @@ export class AccountResolver {
   ): Promise<Account> {
     return this.service.update(accountId, name, currency)
   }
+
+  @Mutation(() => Boolean)
+  @Authorized(Roles.MEMBER)
+  deleteAccount(@Arg('accountId') accountId: number): Promise<boolean> {
+    return this.service.remove(accountId)
+  }
 }
