@@ -34,6 +34,8 @@ export class ItemService {
       }
     })
 
+    this.updateAccount(item.accountId)
+
     return item
   }
 
@@ -54,16 +56,39 @@ export class ItemService {
       }
     })
 
+    this.updateAccount(item.accountId)
+
     return item
   }
 
   async remove(id: number): Promise<boolean> {
-    await db.item.delete({
+    const item = await db.item.delete({
       where: {
         id
       }
     })
 
+    this.updateAccount(item.accountId)
+
     return true
+  }
+
+  private async updateAccount(id: number): Promise<void> {
+    const items = await db.item.findMany({
+      where: {
+        accountId: id
+      }
+    })
+
+    const amount = items.reduce((total, { amount }) => total + amount, 0)
+
+    await db.account.update({
+      data: {
+        amount
+      },
+      where: {
+        id
+      }
+    })
   }
 }
