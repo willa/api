@@ -1,12 +1,36 @@
 import { Service } from 'typedi'
 
 import { db } from '..'
-import { Item } from '../types/type-graphql'
+import { Item, User } from '../types/type-graphql'
 
 @Service()
 export class ItemService {
-  async items(accountId: number): Promise<Item[]> {
-    const items = db.item.findMany({
+  async items(user: User): Promise<Item[]> {
+    const accounts = await db.account.findMany({
+      where: {
+        users: {
+          some: {
+            id: user.id
+          }
+        }
+      }
+    })
+
+    const items = await db.item.findMany({
+      where: {
+        account: {
+          id: {
+            in: accounts.map(({ id }) => id)
+          }
+        }
+      }
+    })
+
+    return items
+  }
+
+  async itemsForAccount(accountId: number): Promise<Item[]> {
+    const items = await db.item.findMany({
       where: {
         accountId
       }

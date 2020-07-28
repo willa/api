@@ -1,9 +1,9 @@
-import { Arg, Authorized, Mutation, Query, Resolver } from 'type-graphql'
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql'
 import { Inject } from 'typedi'
 
 import { Roles } from '../lib'
 import { ItemService } from '../services'
-import { Item } from '../types/type-graphql'
+import { Item, User } from '../types/type-graphql'
 
 @Resolver()
 export class ItemResolver {
@@ -11,9 +11,15 @@ export class ItemResolver {
   service!: ItemService
 
   @Query(() => [Item])
+  @Authorized()
+  async items(@Ctx('user') user: User): Promise<Item[]> {
+    return this.service.items(user)
+  }
+
+  @Query(() => [Item])
   @Authorized(Roles.MEMBER)
-  async items(@Arg('accountId') accountId: number): Promise<Item[]> {
-    return this.service.items(accountId)
+  async itemsForAccount(@Arg('accountId') accountId: number): Promise<Item[]> {
+    return this.service.itemsForAccount(accountId)
   }
 
   @Mutation(() => Item)
