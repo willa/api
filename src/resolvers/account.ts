@@ -3,7 +3,7 @@ import { Inject } from 'typedi'
 
 import { Roles } from '../lib'
 import { AccountService } from '../services'
-import { Account, User } from '../types/type-graphql'
+import { Account, User } from '../types/graphql'
 
 @Resolver()
 export class AccountResolver {

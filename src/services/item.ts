@@ -1,7 +1,7 @@
 import { Service } from 'typedi'
 
 import { db } from '..'
-import { Item, User } from '../types/type-graphql'
+import { Item, User } from '../types/graphql'
 
 @Service()
 export class ItemService {
@@ -17,6 +17,9 @@ export class ItemService {
     })
 
     const items = await db.item.findMany({
+      include: {
+        account: true
+      },
       where: {
         account: {
           id: {

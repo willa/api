@@ -64,11 +64,6 @@ migration ..20200726111917-initial
 +  provider = "prisma-client-js"
 +}
 +
-+generator typegraphql {
-+  provider = "node node_modules/typegraphql-prisma/generator.js"
-+  output   = "../src/types/type-graphql"
-+}
-+
 +model User {
 +  id        Int       @default(autoincrement()) @id
 +  name      String

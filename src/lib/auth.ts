@@ -8,7 +8,7 @@ import { AuthChecker } from 'type-graphql'
 
 import { db } from '..'
 import { AuthToken, Context } from '../types'
-import { User } from '../types/type-graphql'
+import { User } from '../types/graphql'
 
 const isMember = async (id: number, userId: number): Promise<boolean> => {
   const account = await db.account.findOne({

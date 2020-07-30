@@ -1,7 +1,7 @@
 import { Service } from 'typedi'
 
 import { db } from '..'
-import { Account, User } from '../types/type-graphql'
+import { Account, User } from '../types/graphql'
 
 @Service()
 export class AccountService {

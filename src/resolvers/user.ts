@@ -3,7 +3,7 @@ import { Inject } from 'typedi'
 
 import { UserService } from '../services'
 import { AuthResult } from '../types/graphql'
-import { User } from '../types/type-graphql'
+import { User } from '../types/graphql'
 
 @Resolver()
 export class UserResolver {
