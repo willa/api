@@ -1,4 +1,12 @@
-import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql'
+import {
+  Arg,
+  Authorized,
+  Ctx,
+  Int,
+  Mutation,
+  Query,
+  Resolver
+} from 'type-graphql'
 import { Inject } from 'typedi'
 
 import { Roles } from '../lib'
@@ -29,7 +37,7 @@ export class AccountResolver {
   @Mutation(() => Account)
   @Authorized(Roles.MEMBER)
   updateAccount(
-    @Arg('accountId') accountId: number,
+    @Arg('accountId', () => Int) accountId: number,
     @Arg('name') name: string,
     @Arg('currency') currency: string
   ): Promise<Account> {
@@ -38,7 +46,9 @@ export class AccountResolver {
 
   @Mutation(() => Boolean)
   @Authorized(Roles.MEMBER)
-  deleteAccount(@Arg('accountId') accountId: number): Promise<boolean> {
+  deleteAccount(
+    @Arg('accountId', () => Int) accountId: number
+  ): Promise<boolean> {
     return this.service.remove(accountId)
   }
 }
