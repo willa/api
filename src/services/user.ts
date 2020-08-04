@@ -1,11 +1,15 @@
-import { Service } from 'typedi'
+import { Inject, Service } from 'typedi'
 
 import { db } from '..'
 import { auth } from '../lib'
 import { AuthResult } from '../types/graphql'
+import { AccountService } from '.'
 
 @Service()
 export class UserService {
+  @Inject()
+  accounts!: AccountService
+
   async signUp(
     name: string,
     email: string,
@@ -28,6 +32,8 @@ export class UserService {
         password: await auth.hashPassword(password)
       }
     })
+
+    await this.accounts.create(user, 'Default', 'USD')
 
     const token = auth.createToken(user)
 
