@@ -51,4 +51,12 @@ export class AccountResolver {
   ): Promise<boolean> {
     return this.service.delete(accountId)
   }
+
+  @Authorized(Roles.ACCOUNT_MEMBER)
+  @Mutation(() => Boolean)
+  async resetAccount(
+    @Arg('accountId', () => Int) accountId: number
+  ): Promise<boolean> {
+    return this.service.reset(accountId)
+  }
 }

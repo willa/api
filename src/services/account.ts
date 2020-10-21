@@ -59,4 +59,17 @@ export class AccountService {
 
     return true
   }
+
+  async reset(id: number): Promise<boolean> {
+    await db.account.update({
+      data: {
+        amount: 0
+      },
+      where: {
+        id
+      }
+    })
+
+    return true
+  }
 }
