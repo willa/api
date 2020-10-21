@@ -1,5 +1,18 @@
 import Prisma from '@prisma/client'
-import { Field, Int, ObjectType } from 'type-graphql'
+import { Field, Int, ObjectType, registerEnumType } from 'type-graphql'
+
+// enums
+
+export enum AccountType {
+  EXPENSE = 'EXPENSE',
+  SAVINGS = 'SAVINGS'
+}
+
+registerEnumType(AccountType, {
+  name: 'AccountType'
+})
+
+// models
 
 @ObjectType()
 export class User
@@ -27,6 +40,9 @@ export class Account implements Prisma.Account {
 
   @Field()
   currency!: string
+
+  @Field(() => AccountType)
+  type!: Prisma.AccountType
 
   @Field()
   createdAt!: Date

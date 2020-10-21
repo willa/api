@@ -1,0 +1,42 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateEnum",
+      "enum": "AccountType",
+      "values": ["EXPENSE", "SAVINGS"]
+    },
+    {
+      "tag": "CreateField",
+      "model": "Account",
+      "field": "type",
+      "type": "AccountType",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Account",
+          "field": "type"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Account",
+          "field": "type"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "EXPENSE"
+    }
+  ]
+}
