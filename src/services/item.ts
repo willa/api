@@ -69,11 +69,10 @@ export class ItemService {
       }
     })
 
-    // TODO: test this
     await db.account.update({
       data: {
         amount: {
-          increment: item.amount - next.amount
+          increment: next.amount - item.amount
         }
       },
       where: {
