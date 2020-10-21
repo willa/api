@@ -3,6 +3,7 @@ import { animals, colors, uniqueNamesGenerator } from 'unique-names-generator'
 
 import { db } from '..'
 import { AuthResult } from '../types/graphql'
+import { AccountType } from '../types/models'
 import { AccountService } from './account'
 import { AuthService } from './auth'
 
@@ -37,7 +38,14 @@ export class UserService {
 
       await this.account.create(user, {
         currency: 'USD',
-        name: 'Default'
+        name: 'Expenses',
+        type: AccountType.EXPENSE
+      })
+
+      await this.account.create(user, {
+        currency: 'USD',
+        name: 'Savings',
+        type: AccountType.SAVINGS
       })
     }
 

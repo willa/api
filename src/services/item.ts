@@ -12,9 +12,8 @@ export class ItemService {
       orderBy: {
         date: 'desc'
       },
-
       where: {
-        id: accountId
+        accountId
       }
     })
 

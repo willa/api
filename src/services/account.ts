@@ -10,7 +10,7 @@ export class AccountService {
   async fetch(user: User): Promise<Account[]> {
     const accounts = await db.account.findMany({
       orderBy: {
-        createdAt: 'desc'
+        updatedAt: 'desc'
       },
       where: {
         users: {
