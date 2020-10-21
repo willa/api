@@ -3,7 +3,7 @@
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "lib": ["dom", "esnext"],
+    "lib": ["dom", "esnext", "esnext.asynciterable"],
     "module": "commonjs",
     "outDir": "dist",
     "rootDir": "src",

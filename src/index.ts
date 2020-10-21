@@ -7,9 +7,8 @@ import { ApolloServer } from 'apollo-server'
 import { buildSchema } from 'type-graphql'
 import { Container } from 'typedi'
 
-import { auth, authChecker } from './lib'
+import { authChecker, getUser } from './lib'
 import { resolvers } from './resolvers'
-import { Context } from './types'
 
 export const db = new PrismaClient()
 
@@ -23,15 +22,15 @@ const main = async (): Promise<void> => {
   })
 
   const server = new ApolloServer({
-    context: async ({ req }): Promise<Context> => ({
-      user: await auth.getUser(req)
+    context: async ({ req }) => ({
+      user: await getUser(req)
     }),
     schema
   })
 
-  await server.listen(PORT)
+  const { url } = await server.listen(PORT)
 
-  console.log(`Running on ${PORT}`)
+  console.log(`Running on ${url}graphql`)
 }
 
 main()

@@ -1,3 +1,4 @@
+import { User } from '@prisma/client'
 import {
   Arg,
   Authorized,
@@ -9,54 +10,44 @@ import {
 } from 'type-graphql'
 import { Inject } from 'typedi'
 
-import { Roles } from '../lib'
 import { ItemService } from '../services'
-import { Item, User } from '../types/graphql'
+import { Roles } from '../types'
+import { ItemInput } from '../types/graphql'
+import { Item } from '../types/models'
 
 @Resolver()
 export class ItemResolver {
   @Inject()
   service!: ItemService
 
+  @Authorized(Roles.ACCOUNT_MEMBER)
   @Query(() => [Item])
-  @Authorized()
-  async items(@Ctx('user') user: User): Promise<Item[]> {
-    return this.service.items(user)
+  async items(@Arg('accountId', () => Int) accountId: number): Promise<Item[]> {
+    return this.service.fetch(accountId)
   }
 
-  @Query(() => [Item])
-  @Authorized(Roles.MEMBER)
-  async itemsForAccount(
-    @Arg('accountId', () => Int) accountId: number
-  ): Promise<Item[]> {
-    return this.service.itemsForAccount(accountId)
-  }
-
+  @Authorized(Roles.ACCOUNT_MEMBER)
   @Mutation(() => Item)
-  @Authorized(Roles.MEMBER)
-  createItem(
+  async createItem(
+    @Ctx('user') user: User,
     @Arg('accountId', () => Int) accountId: number,
-    @Arg('amount') amount: number,
-    @Arg('description') description: string,
-    @Arg('type') type: string
+    @Arg('data') data: ItemInput
   ): Promise<Item> {
-    return this.service.create(accountId, amount, description, type)
+    return this.service.create(user, accountId, data)
   }
 
+  @Authorized(Roles.ITEM_MEMBER)
   @Mutation(() => Item)
-  @Authorized(Roles.MEMBER)
-  updateItem(
+  async updateItem(
     @Arg('itemId', () => Int) itemId: number,
-    @Arg('amount') amount: number,
-    @Arg('description') description: string,
-    @Arg('type') type: string
+    @Arg('data') data: ItemInput
   ): Promise<Item> {
-    return this.service.update(itemId, amount, description, type)
+    return this.service.update(itemId, data)
   }
 
+  @Authorized(Roles.ITEM_MEMBER)
   @Mutation(() => Boolean)
-  @Authorized(Roles.MEMBER)
-  deleteItem(@Arg('itemId', () => Int) itemId: number): Promise<boolean> {
-    return this.service.remove(itemId)
+  async deleteItem(@Arg('itemId', () => Int) itemId: number): Promise<boolean> {
+    return this.service.delete(itemId)
   }
 }

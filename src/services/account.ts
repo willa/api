@@ -1,15 +1,20 @@
+import { User } from '@prisma/client'
 import { Service } from 'typedi'
 
 import { db } from '..'
-import { Account, User } from '../types/graphql'
+import { AccountInput } from '../types/graphql'
+import { Account } from '../types/models'
 
 @Service()
 export class AccountService {
-  async accounts(user: User): Promise<Account[]> {
-    const accounts = db.account.findMany({
+  async fetch(user: User): Promise<Account[]> {
+    const accounts = await db.account.findMany({
+      orderBy: {
+        createdAt: 'desc'
+      },
       where: {
         users: {
-          some: {
+          every: {
             id: user.id
           }
         }
@@ -19,12 +24,10 @@ export class AccountService {
     return accounts
   }
 
-  async create(user: User, name: string, currency: string): Promise<Account> {
+  async create(user: User, data: AccountInput): Promise<Account> {
     const account = await db.account.create({
       data: {
-        amount: 0,
-        currency,
-        name,
+        ...data,
         users: {
           connect: {
             id: user.id
@@ -36,12 +39,9 @@ export class AccountService {
     return account
   }
 
-  async update(id: number, name: string, currency: string): Promise<Account> {
+  async update(id: number, data: AccountInput): Promise<Account> {
     const account = await db.account.update({
-      data: {
-        currency,
-        name
-      },
+      data,
       where: {
         id
       }
@@ -50,13 +50,7 @@ export class AccountService {
     return account
   }
 
-  async remove(id: number): Promise<boolean> {
-    await db.item.deleteMany({
-      where: {
-        accountId: id
-      }
-    })
-
+  async delete(id: number): Promise<boolean> {
     await db.account.delete({
       where: {
         id

@@ -1,122 +1,85 @@
-const { SALT_ROUNDS, TOKEN_SECRET } = process.env
+const { TOKEN_SECRET } = process.env
 
+import { User } from '@prisma/client'
 import { AuthenticationError } from 'apollo-server'
-import { compare, hash } from 'bcrypt'
 import { Request } from 'express'
-import { sign, verify } from 'jsonwebtoken'
+import { verify } from 'jsonwebtoken'
 import { AuthChecker } from 'type-graphql'
 
 import { db } from '..'
-import { AuthToken, Context } from '../types'
-import { User } from '../types/graphql'
+import { AuthToken, Context, Roles } from '../types'
 
-const isMember = async (id: number, userId: number): Promise<boolean> => {
-  const account = await db.account.findOne({
-    include: {
-      users: {
-        select: {
-          id: true
-        },
-        take: 1,
-        where: {
-          id: userId
-        }
-      }
-    },
-    where: {
-      id
-    }
-  })
-
-  if (!account) {
-    return false
-  }
-
-  return !!account.users.find(({ id }) => id === userId)
-}
-
-export const authChecker: AuthChecker<Context, number> = async (
+export const authChecker: AuthChecker<Context> = async (
   { args: { accountId, itemId }, context: { user } },
   roles
 ): Promise<boolean> => {
-  if (roles.includes(Roles.MEMBER)) {
+  if (roles.length > 0) {
     if (!user) {
       return false
     }
 
-    if (itemId) {
+    if (roles.includes(Roles.ACCOUNT_MEMBER)) {
+      const account = await db.account.findOne({
+        include: {
+          users: true
+        },
+        where: {
+          id: accountId
+        }
+      })
+
+      return !!account?.users.find(({ id }) => id === user.id)
+    }
+
+    if (roles.includes(Roles.ITEM_MEMBER)) {
       const item = await db.item.findOne({
+        include: {
+          account: {
+            include: {
+              users: true
+            }
+          }
+        },
         where: {
           id: itemId
         }
       })
 
-      if (!item) {
-        return false
-      }
-
-      return isMember(item.accountId, user.id)
+      return !!item?.account.users.find(({ id }) => id === user.id)
     }
-
-    return isMember(accountId, user.id)
   }
 
   return !!user
 }
 
-export enum Roles {
-  MEMBER
+export const getUser = async (request: Request): Promise<User | undefined> => {
+  const header = request.cookies?.token || request.headers?.authorization
+
+  if (!header) {
+    return
+  }
+
+  const token = header.substr(7)
+
+  if (!token) {
+    throw new AuthenticationError('Invalid token')
+  }
+
+  const { id } = verify(token, TOKEN_SECRET) as AuthToken
+
+  if (!id) {
+    throw new AuthenticationError('Invalid token')
+  }
+
+  const user = await db.user.findOne({
+    where: {
+      id
+    }
+  })
+
+  if (!user) {
+    throw new AuthenticationError('User not found')
+  }
+
+  return user
 }
-
-class Auth {
-  createToken(user: User): string {
-    return sign(
-      {
-        id: user.id
-      },
-      TOKEN_SECRET
-    )
-  }
-
-  async hashPassword(password: string): Promise<string> {
-    return hash(password, Number(SALT_ROUNDS))
-  }
-
-  async comparePassword(user: User, password: string): Promise<boolean> {
-    return compare(password, user.password)
-  }
-
-  async getUser(request: Request): Promise<User | undefined> {
-    const authorization = request.headers.authorization
-
-    if (!authorization) {
-      return
-    }
-
-    const token = authorization.substr(7)
-
-    if (!token) {
-      throw new AuthenticationError('Invalid token')
-    }
-
-    const { id } = verify(token, TOKEN_SECRET) as AuthToken
-
-    if (!id) {
-      throw new AuthenticationError('Invalid token')
-    }
-
-    const user = await db.user.findOne({
-      where: {
-        id
-      }
-    })
-
-    if (!user) {
-      throw new AuthenticationError('User not found')
-    }
-
-    return user
-  }
-}
-
-export const auth = new Auth()

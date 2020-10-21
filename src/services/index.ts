@@ -1,3 +1,5 @@
 export { AccountService } from './account'
+export { AuthService } from './auth'
 export { ItemService } from './item'
+export { PushService } from './push'
 export { UserService } from './user'

@@ -3,33 +3,21 @@ import { Inject } from 'typedi'
 
 import { UserService } from '../services'
 import { AuthResult } from '../types/graphql'
-import { User } from '../types/graphql'
+import { User } from '../types/models'
 
 @Resolver()
 export class UserResolver {
   @Inject()
   service!: UserService
 
-  @Query(() => User)
   @Authorized()
-  async profile(@Ctx('user') user: User): Promise<User> {
+  @Query(() => User)
+  profile(@Ctx('user') user: User): User {
     return user
   }
 
   @Mutation(() => AuthResult)
-  signUp(
-    @Arg('name') name: string,
-    @Arg('email') email: string,
-    @Arg('password') password: string
-  ): Promise<AuthResult> {
-    return this.service.signUp(name, email, password)
-  }
-
-  @Mutation(() => AuthResult)
-  signIn(
-    @Arg('email') email: string,
-    @Arg('password') password: string
-  ): Promise<AuthResult> {
-    return this.service.signIn(email, password)
+  signIn(@Arg('token') token: string): Promise<AuthResult> {
+    return this.service.signIn(token)
   }
 }

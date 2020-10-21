@@ -1,2 +1,3 @@
-export { Roles, auth, authChecker } from './auth'
+export * from './auth'
+
 export { firebase } from './firebase'

@@ -1,121 +1,108 @@
+import { User } from '@prisma/client'
 import { Service } from 'typedi'
 
 import { db } from '..'
-import { Item, User } from '../types/graphql'
+import { ItemInput } from '../types/graphql'
+import { Item } from '../types/models'
 
 @Service()
 export class ItemService {
-  async items(user: User): Promise<Item[]> {
-    const accounts = await db.account.findMany({
+  async fetch(accountId: number): Promise<Item[]> {
+    const items = await db.item.findMany({
+      orderBy: {
+        date: 'desc'
+      },
+
       where: {
-        users: {
-          some: {
+        id: accountId
+      }
+    })
+
+    return items
+  }
+
+  async create(user: User, accountId: number, data: ItemInput): Promise<Item> {
+    const item = await db.item.create({
+      data: {
+        ...data,
+        account: {
+          connect: {
+            id: accountId
+          }
+        },
+        user: {
+          connect: {
             id: user.id
           }
         }
       }
     })
 
-    const items = await db.item.findMany({
-      include: {
-        account: true
+    await db.account.update({
+      data: {
+        amount: {
+          increment: item.amount
+        }
       },
       where: {
-        account: {
-          id: {
-            in: accounts.map(({ id }) => id)
-          }
-        }
+        id: accountId
       }
     })
-
-    return items
-  }
-
-  async itemsForAccount(accountId: number): Promise<Item[]> {
-    const items = await db.item.findMany({
-      where: {
-        accountId
-      }
-    })
-
-    return items
-  }
-
-  async create(
-    accountId: number,
-    amount: number,
-    description: string,
-    type: string
-  ): Promise<Item> {
-    const item = await db.item.create({
-      data: {
-        account: {
-          connect: {
-            id: accountId
-          }
-        },
-        amount,
-        description,
-        type
-      }
-    })
-
-    this.updateAccount(item.accountId)
 
     return item
   }
 
-  async update(
-    id: number,
-    amount: number,
-    description: string,
-    type: string
-  ): Promise<Item> {
-    const item = await db.item.update({
-      data: {
-        amount,
-        description,
-        type
-      },
+  async update(id: number, data: ItemInput): Promise<Item> {
+    const item = await db.item.findOne({
       where: {
         id
       }
     })
 
-    this.updateAccount(item.accountId)
+    if (!item) {
+      throw new Error('Item not found')
+    }
 
-    return item
+    const next = await db.item.update({
+      data,
+      where: {
+        id
+      }
+    })
+
+    // TODO: test this
+    await db.account.update({
+      data: {
+        amount: {
+          increment: item.amount - next.amount
+        }
+      },
+      where: {
+        id: item.accountId
+      }
+    })
+
+    return next
   }
 
-  async remove(id: number): Promise<boolean> {
+  async delete(id: number): Promise<boolean> {
     const item = await db.item.delete({
       where: {
         id
       }
     })
 
-    this.updateAccount(item.accountId)
-
-    return true
-  }
-
-  private async updateAccount(id: number): Promise<void> {
-    const items = await db.item.findMany({
-      where: {
-        accountId: id
-      }
-    })
-
-    const amount = items.reduce((total, { amount }) => total + amount, 0)
-
     await db.account.update({
       data: {
-        amount
+        amount: {
+          decrement: item.amount
+        }
       },
       where: {
-        id
+        id: item.accountId
       }
     })
+
+    return true
   }
 }

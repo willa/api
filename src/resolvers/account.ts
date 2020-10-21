@@ -1,3 +1,4 @@
+import { User } from '@prisma/client'
 import {
   Arg,
   Authorized,
@@ -9,46 +10,45 @@ import {
 } from 'type-graphql'
 import { Inject } from 'typedi'
 
-import { Roles } from '../lib'
 import { AccountService } from '../services'
-import { Account, User } from '../types/graphql'
+import { Roles } from '../types'
+import { AccountInput } from '../types/graphql'
+import { Account } from '../types/models'
 
 @Resolver()
 export class AccountResolver {
   @Inject()
   service!: AccountService
 
+  @Authorized()
   @Query(() => [Account])
-  @Authorized()
   async accounts(@Ctx('user') user: User): Promise<Account[]> {
-    return this.service.accounts(user)
+    return this.service.fetch(user)
   }
 
-  @Mutation(() => Account)
   @Authorized()
-  createAccount(
-    @Ctx('user') user: User,
-    @Arg('name') name: string,
-    @Arg('currency') currency: string
-  ): Promise<Account> {
-    return this.service.create(user, name, currency)
-  }
-
   @Mutation(() => Account)
-  @Authorized(Roles.MEMBER)
-  updateAccount(
-    @Arg('accountId', () => Int) accountId: number,
-    @Arg('name') name: string,
-    @Arg('currency') currency: string
+  async createAccount(
+    @Ctx('user') user: User,
+    @Arg('data') data: AccountInput
   ): Promise<Account> {
-    return this.service.update(accountId, name, currency)
+    return this.service.create(user, data)
   }
 
+  @Authorized(Roles.ACCOUNT_MEMBER)
+  @Mutation(() => Account)
+  async updateAccount(
+    @Arg('accountId', () => Int) accountId: number,
+    @Arg('data') data: AccountInput
+  ): Promise<Account> {
+    return this.service.update(accountId, data)
+  }
+
+  @Authorized(Roles.ACCOUNT_MEMBER)
   @Mutation(() => Boolean)
-  @Authorized(Roles.MEMBER)
-  deleteAccount(
+  async deleteAccount(
     @Arg('accountId', () => Int) accountId: number
   ): Promise<boolean> {
-    return this.service.remove(accountId)
+    return this.service.delete(accountId)
   }
 }
