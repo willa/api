@@ -15,8 +15,7 @@ registerEnumType(AccountType, {
 // models
 
 @ObjectType()
-export class User
-  implements Omit<Prisma.User, 'firebaseId' | 'createdAt' | 'updatedAt'> {
+export class User implements Omit<Prisma.User, 'createdAt' | 'updatedAt'> {
   @Field(() => Int)
   id!: number
 
@@ -28,7 +27,7 @@ export class User
 }
 
 @ObjectType()
-export class Account implements Prisma.Account {
+export class Account implements Omit<Prisma.Account, 'createdAt'> {
   @Field(() => Int)
   id!: number
 
@@ -45,14 +44,13 @@ export class Account implements Prisma.Account {
   type!: Prisma.AccountType
 
   @Field()
-  createdAt!: Date
-
-  @Field()
   updatedAt!: Date
 }
 
 @ObjectType()
-export class Item implements Omit<Prisma.Item, 'accountId' | 'userId'> {
+export class Item
+  implements
+    Omit<Prisma.Item, 'accountId' | 'userId' | 'createdAt' | 'updatedAt'> {
   @Field(() => Int)
   id!: number
 
@@ -67,10 +65,4 @@ export class Item implements Omit<Prisma.Item, 'accountId' | 'userId'> {
 
   @Field()
   type!: string
-
-  @Field()
-  createdAt!: Date
-
-  @Field()
-  updatedAt!: Date
 }
