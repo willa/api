@@ -5,19 +5,13 @@ import { sign } from 'jsonwebtoken'
 import { Service } from 'typedi'
 
 import { firebase } from '../lib'
-import { FirebaseUser } from '../types'
 
 @Service()
 export class AuthService {
-  async verifyToken(token: string): Promise<FirebaseUser> {
-    const { uid } = await firebase.auth().verifyIdToken(token)
+  async verifyToken(token: string): Promise<string | undefined> {
+    const { email } = await firebase.auth().verifyIdToken(token)
 
-    const { displayName, email } = await firebase.auth().getUser(uid)
-
-    return {
-      email,
-      name: displayName
-    }
+    return email
   }
 
   createToken({ id }: User): string {

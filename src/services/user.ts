@@ -1,4 +1,5 @@
 import { Inject, Service } from 'typedi'
+import { animals, colors, uniqueNamesGenerator } from 'unique-names-generator'
 
 import { db } from '..'
 import { AuthResult } from '../types/graphql'
@@ -14,7 +15,7 @@ export class UserService {
   account!: AccountService
 
   async signIn(token: string): Promise<AuthResult> {
-    const { email, name } = await this.auth.verifyToken(token)
+    const email = await this.auth.verifyToken(token)
 
     if (!email) {
       throw new Error('Email is required')
@@ -27,14 +28,10 @@ export class UserService {
     })
 
     if (!user) {
-      if (!name) {
-        throw new Error('Name is required')
-      }
-
       user = await db.user.create({
         data: {
           email,
-          name
+          name: this.generateName()
         }
       })
 
@@ -50,5 +47,12 @@ export class UserService {
       token: jwt,
       user
     }
+  }
+
+  private generateName(): string {
+    return uniqueNamesGenerator({
+      dictionaries: [colors, animals],
+      separator: '-'
+    })
   }
 }
