@@ -22,8 +22,14 @@ export class ItemResolver {
 
   @Authorized(Roles.ACCOUNT_MEMBER)
   @Query(() => [Item])
-  async items(@Arg('accountId', () => Int) accountId: number): Promise<Item[]> {
-    return this.service.fetch(accountId)
+  async items(
+    @Arg('accountId', () => Int) accountId: number,
+    @Arg('after', () => Int, {
+      nullable: true
+    })
+    after?: number
+  ): Promise<Item[]> {
+    return this.service.fetch(accountId, after)
   }
 
   @Authorized(Roles.ACCOUNT_MEMBER)
