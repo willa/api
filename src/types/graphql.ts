@@ -16,6 +16,12 @@ export class AuthResult {
 // inputs
 
 @InputType()
+export class UserInput {
+  @Field()
+  name!: string
+}
+
+@InputType()
 export class AccountInput {
   @Field()
   name!: string

@@ -2,8 +2,8 @@ import { Inject, Service } from 'typedi'
 import { animals, colors, uniqueNamesGenerator } from 'unique-names-generator'
 
 import { db } from '..'
-import { AuthResult } from '../types/graphql'
-import { AccountType } from '../types/models'
+import { AuthResult, UserInput } from '../types/graphql'
+import { AccountType, User } from '../types/models'
 import { AccountService } from './account'
 import { AuthService } from './auth'
 
@@ -55,6 +55,17 @@ export class UserService {
       token: jwt,
       user
     }
+  }
+
+  async update(user: User, data: UserInput): Promise<User> {
+    const next = await db.user.update({
+      data,
+      where: {
+        id: user.id
+      }
+    })
+
+    return next
   }
 
   private generateName(): string {
