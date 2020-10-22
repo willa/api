@@ -24,12 +24,12 @@ export class ItemResolver {
   @Query(() => [Item])
   async items(
     @Arg('accountId', () => Int) accountId: number,
-    @Arg('after', () => Int, {
+    @Arg('before', {
       nullable: true
     })
-    after?: number
+    before?: string
   ): Promise<Item[]> {
-    return this.service.fetch(accountId, after)
+    return this.service.fetch(accountId, before)
   }
 
   @Authorized(Roles.ACCOUNT_MEMBER)
