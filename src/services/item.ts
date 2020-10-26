@@ -7,17 +7,15 @@ import { Item } from '../types/models'
 
 @Service()
 export class ItemService {
-  async fetch(accountId: number, before?: string): Promise<Item[]> {
+  async fetch(accountId: number, skip?: number): Promise<Item[]> {
     const items = await db.item.findMany({
       orderBy: {
         date: 'desc'
       },
-      take: 100,
+      skip,
+      take: 1,
       where: {
-        accountId,
-        date: {
-          lte: before
-        }
+        accountId
       }
     })
 
