@@ -24,12 +24,18 @@ export class ItemResolver {
   @Query(() => [Item])
   async items(
     @Arg('accountId', () => Int) accountId: number,
-    @Arg('skip', () => Int, {
+    @Arg('take', () => Int, {
+      defaultValue: 100,
       nullable: true
     })
-    skip?: number
+    take: number,
+    @Arg('skip', () => Int, {
+      defaultValue: 0,
+      nullable: true
+    })
+    skip: number
   ): Promise<Item[]> {
-    return this.service.fetch(accountId, skip)
+    return this.service.fetch(accountId, take, skip)
   }
 
   @Authorized(Roles.ACCOUNT_MEMBER)
