@@ -1,6 +1,6 @@
 import { Field, InputType, ObjectType } from 'type-graphql'
 
-import { AccountType, User } from './models'
+import { User } from './models'
 
 // objects
 
@@ -29,8 +29,8 @@ export class AccountInput {
   @Field()
   currency!: string
 
-  @Field(() => AccountType)
-  type!: AccountType
+  @Field()
+  type!: string
 }
 
 @InputType()

@@ -1,18 +1,5 @@
 import Prisma from '@prisma/client'
-import { Field, Int, ObjectType, registerEnumType } from 'type-graphql'
-
-// enums
-
-export enum AccountType {
-  EXPENSE = 'EXPENSE',
-  SAVINGS = 'SAVINGS'
-}
-
-registerEnumType(AccountType, {
-  name: 'AccountType'
-})
-
-// models
+import { Field, Int, ObjectType } from 'type-graphql'
 
 @ObjectType()
 export class User implements Omit<Prisma.User, 'createdAt' | 'updatedAt'> {
@@ -40,8 +27,8 @@ export class Account implements Omit<Prisma.Account, 'createdAt'> {
   @Field()
   currency!: string
 
-  @Field(() => AccountType)
-  type!: Prisma.AccountType
+  @Field()
+  type!: string
 
   @Field()
   updatedAt!: Date
