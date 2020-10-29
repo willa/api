@@ -26,7 +26,7 @@ model Account {
   name     String
   amount   Float  @default(0)
   currency String
-  type     String @default("EXPENSE")
+  type     String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -51,4 +51,6 @@ model Item {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([accountId, date])
 }

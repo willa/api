@@ -255,6 +255,13 @@
     {
       "tag": "CreateField",
       "model": "Account",
+      "field": "type",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Account",
       "field": "createdAt",
       "type": "DateTime",
       "arity": "Required"
@@ -570,6 +577,22 @@
           "field": "updatedAt"
         },
         "directive": "updatedAt"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Model",
+          "model": "Item",
+          "arguments": [
+            {
+              "name": "",
+              "value": "[accountId, date]"
+            }
+          ]
+        },
+        "directive": "index"
       }
     }
   ]
