@@ -19,7 +19,7 @@
     "studio": "env-cmd prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "^2.10.0",
+    "@prisma/client": "^2.10.1",
     "apollo-server": "^3.0.0-alpha.3",
     "class-validator": "^0.12.2",
     "firebase-admin": "^9.3.0",
@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@firebase/app-types": "^0.6.1",
-    "@prisma/cli": "2.10.0",
+    "@prisma/cli": "2.10.1",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/node": "^14.14.6",
     "@typescript-eslint/eslint-plugin": "^4.6.0",
