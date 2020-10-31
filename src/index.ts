@@ -34,3 +34,5 @@ const main = async (): Promise<void> => {
 }
 
 main()
+
+process.on('SIGTERM', process.exit)
