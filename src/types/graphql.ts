@@ -1,6 +1,6 @@
 import { Field, InputType, ObjectType } from 'type-graphql'
 
-import { User } from './models'
+import { Item, User } from './models'
 
 // objects
 
@@ -11,6 +11,15 @@ export class AuthResult {
 
   @Field(() => User)
   user!: User
+}
+
+@ObjectType()
+export class ItemsResult {
+  @Field(() => [Item])
+  items!: Item[]
+
+  @Field()
+  hasMore!: boolean
 }
 
 // inputs

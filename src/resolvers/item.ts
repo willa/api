@@ -12,7 +12,7 @@ import { Inject } from 'typedi'
 
 import { ItemService } from '../services'
 import { Roles } from '../types'
-import { ItemInput } from '../types/graphql'
+import { ItemInput, ItemsResult } from '../types/graphql'
 import { Item } from '../types/models'
 
 @Resolver()
@@ -21,7 +21,7 @@ export class ItemResolver {
   service!: ItemService
 
   @Authorized(Roles.ACCOUNT_MEMBER)
-  @Query(() => [Item])
+  @Query(() => ItemsResult)
   async items(
     @Arg('accountId', () => Int) accountId: number,
     @Arg('take', () => Int, {
@@ -34,7 +34,7 @@ export class ItemResolver {
       nullable: true
     })
     skip: number
-  ): Promise<Item[]> {
+  ): Promise<ItemsResult> {
     return this.service.fetch(accountId, take, skip)
   }
 

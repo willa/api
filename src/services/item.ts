@@ -2,12 +2,16 @@ import { User } from '@prisma/client'
 import { Service } from 'typedi'
 
 import { db } from '..'
-import { ItemInput } from '../types/graphql'
+import { ItemInput, ItemsResult } from '../types/graphql'
 import { Item } from '../types/models'
 
 @Service()
 export class ItemService {
-  async fetch(accountId: number, take: number, skip: number): Promise<Item[]> {
+  async fetch(
+    accountId: number,
+    take: number,
+    skip: number
+  ): Promise<ItemsResult> {
     const items = await db.item.findMany({
       orderBy: {
         date: 'desc'
@@ -19,7 +23,21 @@ export class ItemService {
       }
     })
 
-    return items
+    const more = await db.item.count({
+      orderBy: {
+        date: 'desc'
+      },
+      skip: skip + take,
+      take,
+      where: {
+        accountId
+      }
+    })
+
+    return {
+      hasMore: more > 0,
+      items
+    }
   }
 
   async create(user: User, accountId: number, data: ItemInput): Promise<Item> {
